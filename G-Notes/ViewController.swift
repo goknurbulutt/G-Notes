@@ -8,12 +8,26 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
+    
+    @IBOutlet weak var notesTableView: UITableView!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        navigationController?.navigationBar.topItem?.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonClicked))
+//        add butonunun eklenmesi
+        
+        
     }
 
+    @objc func addButtonClicked (){
+        performSegue(withIdentifier: "toDetailsVC", sender: nil)
+
+        
+        
+    }
 
 }
 
