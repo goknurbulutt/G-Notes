@@ -14,9 +14,55 @@ class DetailsNoteViewController: UIViewController {
     
     @IBOutlet weak var noteTextView: UITextView!
     
+    
+    var selectedNoteName = ""
+    var selectedNoteId : UUID?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        if selectedNoteName != ""{
+            if let uuidString = selectedNoteId?.uuidString {
+                
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                let context = appDelegate.persistentContainer.viewContext
+                
+                let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Notes")
+                fetchRequest.predicate = NSPredicate(format: "id = %@", uuidString)
+                fetchRequest.returnsObjectsAsFaults = false
+                
+                
+                do{
+                    let results = try context.fetch(fetchRequest)
+                    if results.count > 0{
+                        
+                        for result in results as! [NSManagedObject]{
+                            
+                            
+                            if let title = result.value(forKey: "title") as? String {
+                                titleTextField.text = title
+                                
+                            }
+                            
+                            if let note = result.value(forKey: "note") as? String {
+                                noteTextView.text = note
+                            }
+                            
+                    }
+                    
+                    
+                    }
+                }catch{
+                    print("hata varr")
+                }
+             
+            }
+            
+        }else {
+            titleTextField.text = ""
+            noteTextView.text = ""
+        }
         
         let saveButton = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(saveClicked))
         navigationItem.rightBarButtonItem = saveButton

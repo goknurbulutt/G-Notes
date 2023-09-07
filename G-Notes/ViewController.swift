@@ -15,6 +15,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     var titleSeries = [String]()
     var idSeries = [UUID]()
     
+    var selectedName = ""
+    var selectedUUID : UUID?
+    
    
     
     
@@ -52,18 +55,27 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         do{
             let results = try context.fetch(fetchRequest)
-            
-            for result in results as! [NSManagedObject]{
-                if let title = result.value(forKey: "title") as? String {
-                    titleSeries.append(title)
+            if results.count > 0{
+                
+                for result in results as! [NSManagedObject]{
+                    if let title = result.value(forKey: "title") as? String {
+                        titleSeries.append(title)
+                        
+                    }
                     
-                }
+                    
+                    
+                    
+                    
+                    if let id = result.value(forKey: "id") as? UUID {
+                        idSeries.append(id)
+                    }
+                    
+                    notesTableView.reloadData()
                 
-                if let id = result.value(forKey: "id") as? UUID {
-                    idSeries.append(id)
-                }
-                
-                notesTableView.reloadData()
+            }
+            
+            
             }
         }catch{
             print("hata varr")
@@ -72,6 +84,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
 
     @objc func addButtonClicked (){
+        
+        selectedName = ""
         performSegue(withIdentifier: "toDetailsVC", sender: nil)
 
         
@@ -90,7 +104,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toDetailsVC"{
+            let destinationVC = segue.destination as! DetailsNoteViewController
+            
+            destinationVC.selectedNoteName = selectedName
+            destinationVC.selectedNoteId = selectedUUID
+        }
+    }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedName = titleSeries[indexPath.row]
+        selectedUUID = idSeries[indexPath.row]
+        performSegue(withIdentifier: "toDetailsVC", sender: nil)
+    }
     
 }
 
