@@ -76,44 +76,37 @@ class DetailsNoteViewController: UIViewController {
     }
     
     @objc func saveClicked() {
-        
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
         
-        let note = NSEntityDescription.insertNewObject(forEntityName: "Notes", into: context)
-        
-        note.setValue(noteTextView.text, forKey: "note")
-        note.setValue(titleTextField.text, forKey: "title")
-        note.setValue(UUID(), forKey: "id")
-
-        
-        do {
-            try context.save()
-            print("saved")
-        } catch {
-            print("there is an error")
+        if let uuidString = selectedNoteId?.uuidString {
+            let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Notes")
+            fetchRequest.predicate = NSPredicate(format: "id = %@", uuidString)
+            
+            do {
+                let results = try context.fetch(fetchRequest)
+                if results.count > 0 {
+                    if let noteToUpdate = results.first as? NSManagedObject {
+                        noteToUpdate.setValue(titleTextField.text, forKey: "title")
+                        noteToUpdate.setValue(noteTextView.text, forKey: "note")
+                        
+                        do {
+                            try context.save()
+                            print("Note updated successfully")
+                        } catch let error as NSError {
+                            print("Error updating note: \(error.localizedDescription)")
+                        }
+                    }
+                }
+            } catch {
+                print("Error fetching note: \(error.localizedDescription)")
+            }
         }
-
-    
         
-        
-        do {
-            try context.save()
-            print("Saved successfully")
-        } catch let error as NSError {
-            print("Error saving data: \(error.localizedDescription)")
-        }
-
-        
-
-        
-        NotificationCenter.default.post(name: Notification.Name("dataEntered"), object:nil)
+        NotificationCenter.default.post(name: Notification.Name("dataEntered"), object: nil)
         
         navigationController?.popViewController(animated: true)
-//        saveden sonra tekrar note list ekranına dönsün
-           
-        
-
     }
+
 }
 

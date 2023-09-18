@@ -120,7 +120,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete{
+        if editingStyle == .delete {
             let appDelegate = UIApplication.shared.delegate as! AppDelegate
             let context = appDelegate.persistentContainer.viewContext
             
@@ -130,50 +130,54 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             fetchRequest.predicate = NSPredicate(format: "id = %@", uuidString)
             fetchRequest.returnsObjectsAsFaults = false
             
-            do{
+            do {
                 let results = try context.fetch(fetchRequest)
                 if results.count > 0 {
-                    
-                    for result in results as! [NSManagedObject]{
-                        
+                    for result in results as! [NSManagedObject] {
                         
                         if let id = result.value(forKey: "id") as? UUID {
-                            if id == idSeries[indexPath.row]{
+                            if id == idSeries[indexPath.row] {
+                                let alert = UIAlertController(title: "Note Deletion", message: "Are you sure you want to delete this note?", preferredStyle: .alert)
                                 
-                                context.delete(result)
-                                titleSeries.remove(at: indexPath.row)
-                                idSeries.remove(at: indexPath.row)
-                                
-                                self.notesTableView.reloadData()
-                                
-                                do{
-                                    try context.save()
-                                }catch{
+                                let yesAction = UIAlertAction(title: "Yes", style: .destructive) { (action) in
+                                    context.delete(result)
+                                    self.titleSeries.remove(at: indexPath.row)
+                                    self.idSeries.remove(at: indexPath.row)
                                     
+                                    self.notesTableView.reloadData()
+                                    
+                                    do {
+                                        try context.save()
+                                    } catch {
+                                        print("Hata: Not silinemedi")
+                                    }
                                 }
+                                
+                                let noAction = UIAlertAction(title: "No", style: .cancel, handler: nil)
+                                
+                                alert.addAction(yesAction)
+                                alert.addAction(noAction)
+                                
+                                present(alert, animated: true, completion: nil)
                                 break
+                            }
                         }
-                        
+                    }
                 }
-                
-                
-                }
+            } catch {
+                print("Hata: Veri çekilemedi")
             }
-            }catch{
-                print("hata varr")
-            }
-         
         }
+    }
+
+    
+    
+    
+    
+
+
+
+
+    
         
     }
-            
-        }
-    
-    
-    
-    
-    
-
-
-
-
