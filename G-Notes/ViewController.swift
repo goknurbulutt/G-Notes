@@ -149,7 +149,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                                     do {
                                         try context.save()
                                     } catch {
-                                        print("Hata: Not silinemedi")
+                                        print("Not silinemedi")
                                     }
                                 }
                                 
@@ -165,7 +165,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                     }
                 }
             } catch {
-                print("Hata: Veri çekilemedi")
+                print("Veri çekilemedi")
             }
         }
     }
